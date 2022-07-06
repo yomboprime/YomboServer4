@@ -1,0 +1,22 @@
+{
+  "name": "YomboServer4",
+  "version": "4.0.0",
+  "keywords": [
+    "home",
+    "domotics",
+    "server"
+  ],
+  "author": "yomboprime",
+  "contributors": [],
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "form-data": "^4.0.0",
+    "pngjs": "^6.0.0",
+    "readable-stream": "^4.0.0",
+    "telegram-bot-api": "^2.0.1",
+    "ws": "^8.8.0"
+  }
+}
