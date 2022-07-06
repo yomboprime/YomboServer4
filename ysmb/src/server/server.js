@@ -39,6 +39,8 @@ function initServer() {
 		beginAppTermination( EXIT_NO_ACTION );
 
 	} );
+	
+	getPublicIP();
 
 	createWebServer();
 	
@@ -183,6 +185,29 @@ function error( client, text ) {
 		type: 'error',
 		text: text
 	} ) );
+
+}
+
+function getPublicIP() {
+	
+	serverUtils.spawnProgram(
+		null,
+		"curl",
+		[
+			"ifconfig.me"
+		],
+		( code, output, error ) => {
+			
+			if ( code !== 0 ) {
+				
+				console.log( "Could not get public IP. Are you connected to the Internet?" );
+				
+			}
+			else console.log( "IP=" + output );
+
+		}
+
+	);
 
 }
 
