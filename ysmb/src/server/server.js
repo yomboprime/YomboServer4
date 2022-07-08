@@ -266,7 +266,7 @@ function addToken( type ) {
 	activeTokens.push( {
 		token: token,
 		type: type,
-		creation: new Date()
+		creation: new Date().getTime()
 	} );
 
 	return ( type === 'yspc' ? 'ws' : 'http' ) + '://yomboprime.org:45000?accessToken=' + token;
@@ -275,7 +275,7 @@ function addToken( type ) {
 
 function purgueOldTokens() {
 	
-	const time = new Date();
+	const time = new Date().getTime();
 	
 	let i = 0;
 	while ( i < activeTokens.length ) {
@@ -295,7 +295,7 @@ function consumeToken( token ) {
 
 	if ( ! token ) return null;
 
-	const time = new Date();
+	const time = new Date().getTime();
 
 	for ( let i = 0; i < activeTokens.length; i ++ ) {
 
