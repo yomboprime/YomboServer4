@@ -5,7 +5,7 @@ const fs = require( 'fs' );
 const pathJoin = require( 'path' ).join;
 const WebAppServer = require( "./WebAppServer.js" );
 const serverUtils = require( "./serverUtils.js" );
-const tg = require( './src/server/telegram.js' );
+const tg = require( './telegram.js' );
 const ws = require( 'ws' );
 
 // - Global variables -
@@ -16,7 +16,7 @@ let wsClient = null;
 
 let activeTokens = [];
 
-const CONFIG_PATH = "../../config/config.json";
+const CONFIG_PATH = "./config/config.json";
 let serverConfig = null;
 
 let isAppEnding = false;
@@ -45,7 +45,7 @@ function initServer() {
 	} );
 	
 	// Load config
-	serverConfig = loadFileJSON( CONFIG_PATH, "utf8" );
+	serverConfig = serverUtils.loadFileJSON( CONFIG_PATH, "utf8" );
 	if ( serverConfig === null ) {
 
 		console.log( "Error loading config file config/config.json. Please check its syntax." );
@@ -53,8 +53,8 @@ function initServer() {
 
 	}
 
-	const tok = loadFile( "./config/token", "utf8" ).split( "\n" )[ 0 ];
-	const cid = parseInt( loadFile( "./config/chat_id", "utf8" ).split( "\n" )[ 0 ] );
+	const tok = serverUtils.loadFile( "./config/token", "utf8" ).split( "\n" )[ 0 ];
+	const cid = parseInt( serverUtils.loadFile( "./config/chat_id", "utf8" ).split( "\n" )[ 0 ] );
 
 	tg.startTelegram(
 		tok,
@@ -253,7 +253,7 @@ function addToken( type ) {
 	activeTokens.push( {
 		token: token,
 		type: type,
-		creation: new Date();
+		creation: new Date()
 	} );
 
 	return ( type === 'yspc' ? 'ws' : 'http' ) + '://yomboprime.org:45000?accessToken=' + token;
