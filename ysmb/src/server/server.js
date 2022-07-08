@@ -292,27 +292,28 @@ function purgueOldTokens() {
 	}
 
 function consumeToken( token ) {
-console.log( "DEBUG 1" );
-	if ( ! token ) return false;
-console.log( "DEBUG 2" );	
+
+	if ( ! token ) return null;
+
 	const time = new Date();
-console.log( "DEBUG 3" );
+
 	for ( let i = 0; i < activeTokens.length; i ++ ) {
-console.log( "DEBUG 4" );
+
 		const t = activeTokens[ i ];
 		
 		if ( token === t.token ) {
-console.log( "DEBUG 5" );
+
 			activeTokens.splice( i, 1 );
 			purgueOldTokens();
-			return t.creation + TOKEN_EXPIRATION_MS > time;
+			if ( t.creation + TOKEN_EXPIRATION_MS > time ) return t;
+			else return null;
 			
 		}
 		
 	}
-console.log( "DEBUG 6" );
+
 	purgueOldTokens();
-	return false;
+	return null;
 
 }
 
