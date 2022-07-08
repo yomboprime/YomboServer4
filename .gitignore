@@ -1,4 +1,6 @@
 ysmb/node_modules
 yspc/node_modules
+ysmb/config/token
+ysmb/config/chat_id
 yspc/config/token
 yspc/config/chat_id
