@@ -10,6 +10,8 @@ const ws = require( 'ws' );
 
 // - Global variables -
 
+const TOKEN_EXPIRATION_MS = 30000;
+
 let webAppServer = null;
 let webClient = null;
 let wsClient = null;
@@ -97,11 +99,19 @@ function createWebServer() {
 		},
 		onClientConnection: function( client ) {
 
-			console.log( "Client connected:" );
-			
-			console.log( client.req );
+			console.log( "Client connected." );
 
-			const token = '   ';
+			const params = getClientParameters( client.req );
+			let token = null;
+			for ( let i = 0; i < params.length; i++ ) {
+				if ( params[ i ].name === 'accessToken' ) {
+					
+					token = params[ i ].value;
+					break;
+					
+				}
+			}
+
 			const tokenReg = consumeToken( token );
 			if ( ! tokenReg ) {
 				
@@ -174,11 +184,11 @@ function createWebServer() {
 			} ) );
 
 		},
-		onClientDisconnection: function() {
+		onClientDisconnection: function( client ) {
 
 			console.log( "Client disconnected." );
 
-			if ( tokenReg.type === 'yspc' ) {
+			if ( client === wsClient ) {
 			
 				wsClient = null;
 
@@ -268,7 +278,7 @@ function purgueOldTokens() {
 	while ( i < activeTokens.length ) {
 		
 		const t = activeTokens[ i ];
-		if ( t.creation + 30000 < time ) {
+		if ( t.creation + TOKEN_EXPIRATION_MS < time ) {
 			
 			activeTokens.splice( i, 1 );
 			
@@ -280,8 +290,27 @@ function purgueOldTokens() {
 
 function consumeToken( token ) {
 	
-	return false;
+	if ( ! token ) return false;
 	
+	const time = new Date();
+	
+	for ( let i = 0; i < activeTokens.length; i ++ ) {
+		
+		const t = activeTokens[ i ];
+		
+		if ( token === t.token ) {
+			
+			activeTokens.splice( i, 1 );
+			purgueOldTokens();
+			return t.creation + TOKEN_EXPIRATION_MS > time;
+			
+		}
+		
+	}
+	
+	purgueOldTokens();
+	return false;
+
 }
 
 function info( client, text ) {

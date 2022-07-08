@@ -110,7 +110,7 @@ function processPetition( text ) {
 
 	const url = text;
 	
-	if ( ! url.startsWith( 'ws://yomboprime.org:45000?token=' ) ) return;
+	if ( ! url.startsWith( 'ws://yomboprime.org:45000?accessToken=' ) ) return;
 
 	console.log( "Received petition: " + url );
 
