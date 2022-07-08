@@ -101,7 +101,7 @@ function createWebServer() {
 
 			console.log( "Client connected." );
 
-			const params = getClientParameters( client.req );
+			const params = webAppServer.getClientParameters( client.req );
 			let token = null;
 			for ( let i = 0; i < params.length; i++ ) {
 				if ( params[ i ].name === 'accessToken' ) {
