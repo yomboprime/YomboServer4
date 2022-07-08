@@ -111,6 +111,9 @@ function createWebServer() {
 					
 				}
 			}
+			
+			console.log( "Token: " );
+			console.log( token );
 
 			const tokenReg = consumeToken( token );
 			if ( ! tokenReg ) {
@@ -289,17 +292,17 @@ function purgueOldTokens() {
 	}
 
 function consumeToken( token ) {
-	
+console.log( "DEBUG 1" );
 	if ( ! token ) return false;
-	
+console.log( "DEBUG 2" );	
 	const time = new Date();
-	
+console.log( "DEBUG 3" );
 	for ( let i = 0; i < activeTokens.length; i ++ ) {
-		
+console.log( "DEBUG 4" );
 		const t = activeTokens[ i ];
 		
 		if ( token === t.token ) {
-			
+console.log( "DEBUG 5" );
 			activeTokens.splice( i, 1 );
 			purgueOldTokens();
 			return t.creation + TOKEN_EXPIRATION_MS > time;
@@ -307,7 +310,7 @@ function consumeToken( token ) {
 		}
 		
 	}
-	
+console.log( "DEBUG 6" );
 	purgueOldTokens();
 	return false;
 
