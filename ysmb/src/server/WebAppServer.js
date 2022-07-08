@@ -80,7 +80,7 @@ WebAppServer.prototype.start = function( config, listener ) {
 	*/
 
     // Serve all public content
-    this.mapDirectory( "/", this.pathJoin( "../../" ) );
+    this.mapDirectory( "/", this.pathJoin( "../client/" ) );
 
     // Setup connection with socket.io clients
     this.wss.on( 'connection', function( socket, req ) {
@@ -261,6 +261,7 @@ WebAppServer.prototype.onClientConnectionInternal = function( socket, req ) {
     const client = {
         isGod: false,
         socket: socket,
+		req: req
     };
 
     client.isGod = this.isLocalRequest( req );

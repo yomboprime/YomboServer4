@@ -25,7 +25,7 @@ function initNetwork() {
 
 	const location = document.location;
 
-	socket = new WebSocket( "ws://" + location.host );
+	socket = new WebSocket( "ws://" + location.host + "?accessToken=" + accessToken );
 
 	socket.onopen = function() {
 		console.log( "Connection open." );
@@ -86,12 +86,6 @@ function processMessage( data ) {
 
 			case 'init':
 				console.log( "Received init message " );
-				socket.send( JSON.stringify(
-					{
-						type: "accessToken",
-						accessToken: accessToken
-					}
-				) );
 				break;
 
 			case 'frame':

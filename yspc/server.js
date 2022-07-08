@@ -5,9 +5,7 @@ const PNG = require( 'pngjs' ).PNG;
 const fs = require( 'fs' );
 const pathJoin = require( 'path' ).join;
 const { spawn, exec } = require( 'child_process' );
-
 const tg = require( './src/telegram.js' );
-
 const ws = require( 'ws' );
 
 // - Global variables -
@@ -65,7 +63,7 @@ function initServer() {
 		parseUserInput,
 		() => {
 
-			tg.sendTextMessage( "ℹ️ " + "Telegram bot has started." );
+			tg.sendTextMessage( "ℹ️ " + "YSPC bot is online." );
 
 			//tg.menusEnabled = true;
 /*
@@ -110,34 +108,31 @@ function parseUserInput( message ) {
 
 function processPetition( text ) {
 
-	if ( ! text.startsWith( 'IP=' ) ) return;
+	const url = text;
+	
+	if ( ! url.startsWith( 'ws://yomboprime.org:45000?token=' ) ) return;
 
-	const clientIP = text.substring( 'IP='.length );
+	console.log( "Received petition: " + url );
 
-	console.log( "Received petition: " + clientIP );
-
+/*
 	const MAX_TOKEN = 1000000000;
 	const token = "" + Math.floor( MAX_TOKEN * Math.random() );
+*/
 
-	connectToClient( clientIP, token );
+	connectToServer( url );
 
 }
 
-function connectToClient( ip, token ) {
+function connectToServer( url ) {
 
 	const client = {
-		ip: ip,
-		token: token,
-		isValidated: false,
+		url: url,
 		connectionTimestamp: new Date(),
 		socket: null
 	};
-	
-	tg.sendTextMessage( "http://" + ip + ":8093/client.html?accessToken=" + token );
 
 	console.log( "Connecting..." );
-	
-	const url = "ws://" + ip + ':8091';
+
 	client.socket = new ws.WebSocket( url );
 	
 	client.socket.addEventListener( 'open', () => {
@@ -161,32 +156,11 @@ function connectToClient( ip, token ) {
 		if ( ! message ) return;
 
 		
-		if ( client.isValidated ) {
-
-			switch ( message.type ) {
+		switch ( message.type ) {
 					
-				case 'frameAck':
-					break;
+			case 'frameAck':
+				break;
 					
-			}
-
-		}
-		else {
-
-			if ( message.type === 'accessToken' ) {
-
-				if ( message.accessToken === client.token ) {
-
-					console.log( "WS client has been validated." );
-
-					client.isValidated = true;
-
-					client.socket.send( JSON.stringify( { type: 'frame' } ) );
-
-				}
-
-			}
-
 		}
 
 	} );

@@ -3,17 +3,21 @@
 
 const fs = require( 'fs' );
 const pathJoin = require( 'path' ).join;
-
 const WebAppServer = require( "./WebAppServer.js" );
 const serverUtils = require( "./serverUtils.js" );
+const tg = require( './src/server/telegram.js' );
 const ws = require( 'ws' );
 
 // - Global variables -
 
 let webAppServer = null;
-let wss = null;
 let webClient = null;
 let wsClient = null;
+
+let activeTokens = [];
+
+const CONFIG_PATH = "../../config/config.json";
+let serverConfig = null;
 
 let isAppEnding = false;
 let exitAction = null;
@@ -40,11 +44,42 @@ function initServer() {
 
 	} );
 	
-	getPublicIP();
+	// Load config
+	serverConfig = loadFileJSON( CONFIG_PATH, "utf8" );
+	if ( serverConfig === null ) {
+
+		console.log( "Error loading config file config/config.json. Please check its syntax." );
+		process.exit( 1 );
+
+	}
+
+	const tok = loadFile( "./config/token", "utf8" ).split( "\n" )[ 0 ];
+	const cid = parseInt( loadFile( "./config/chat_id", "utf8" ).split( "\n" )[ 0 ] );
+
+	tg.startTelegram(
+		tok,
+		cid,
+		parseUserInput,
+		() => {
+
+			tg.sendTextMessage( "ℹ️ " + "YSMB bot is online." );
+
+			//tg.menusEnabled = true;
+/*
+			modules = loadModules();
+			if ( modules === null ) {
+
+				console.log( "Error loading modules." );
+				process.exit( 1 );
+
+			}
+*/
+
+		}
+
+	);
 
 	createWebServer();
-	
-	createWSServer();
 
 }
 
@@ -53,23 +88,56 @@ function createWebServer() {
 	webAppServer = new WebAppServer( console.log );
 	webAppServer.start( {
 		"host": "",
-		"listenPort": 8093,
+		"listenPort": 45000,
 		"connectionTimeout": 1000000,
-		"restrictToLocalHost": true
+		"restrictToLocalHost": false
 	}, {
 		onStartServer: function() {
 			console.log( "Web server started." );
 		},
 		onClientConnection: function( client ) {
+
+			console.log( "Client connected:" );
 			
-			console.log( "Client connected." );
+			console.log( client.req );
+
+			const token = '   ';
+			const tokenReg = consumeToken( token );
+			if ( ! tokenReg ) {
+				
+				console.log( "Client NOT validated." );
+				client.socket.terminate();
+				return;
+				
+			}
 			
-			webClient = client;
+			console.log( "Client validated." );
+			
+			if ( tokenReg.type === 'yspc' ) {
+				
+				wsClient = client;
+
+			}
+			else {
+
+				webClient = client;
+
+			}
 
 			client.socket.onerror = function( data ) {
 
 				console.log( "Client Error: " + data );
-				webClient = null;
+
+				if ( tokenReg.type === 'yspc' ) {
+				
+					wsClient = null;
+
+				}
+				else {
+
+					webClient = null;
+
+				}
 
 			};
 
@@ -88,8 +156,11 @@ function createWebServer() {
 							break;
 
 						default:
-							if ( wsClient ) wsClient.socket.send( JSON.stringify( message ) );
-							else error( client, "No server connection." )
+						
+							const otherClient = tokenReg.type === 'yspc' ? webClient : wsClient;
+							//if ( otherClient ) otherClient.socket.send( data.data );
+							if ( otherClient ) otherClient.socket.send( JSON.stringify( message ) );
+							else error( client, "No peer connection (type: " + tokenReg.type + ")." );
 							break;
 
 					}
@@ -106,59 +177,111 @@ function createWebServer() {
 		onClientDisconnection: function() {
 
 			console.log( "Client disconnected." );
-			webClient = null;
+
+			if ( tokenReg.type === 'yspc' ) {
+			
+				wsClient = null;
+
+			}
+			else {
+
+				webClient = null;
+
+			}
 
 		}
 	} );
 }
 
-function createWSServer() {
+function parseUserInput( message ) {
 
-	wss = new ws.Server( { port: 8091 } );
+	console.log( "Received message: " + message.text );
+
+	if ( message.text ) {
+
+		if ( message.text.length > 100 ) return;
+
+		processPetition( message.text );
+
+	}
+	else if ( message.voice ) {
+
+		//if ( serverConfig.enableVoicePlayback ) playVoiceFile( message.voice.file_id );
+
+	}
+	else if ( message.audio ) {
+
+		//if ( serverConfig.enableVoicePlayback ) playVoiceFile( message.audio.file_id );
+
+	}
+
+}
+
+function processPetition( text ) {
+
+	const command = text;
 	
-	wss.on( 'connection', function( socket, req ) {
-
-		const client = {
-			isGod: false,
-			socket: socket,
-		};
+	console.log( "Received command: " + command );
+	
+	let url = null;
+	
+	switch ( command ) {
 		
-		wsClient = client;
+		case 'yspc':
+			url = addToken( 'yspc' );
+			break;
+			
+		case 'ysmb':
+			url = addToken( 'ysmb' );
+			break;
+		
+	}
 
-		console.log( "WS Client connected." );
+	if ( url ) tg.sendTextMessage( url );
+	
+	purgueOldTokens();
 
-		socket.on( "close", function( msg ) {
+}
 
-			console.log( "WS Client disconnected." );
-			wsClient = null;
+function addToken( type ) {
+	
+	if ( activeTokens.length > 10 ) return null;
+	
+	const MAX_TOKEN = 1000000000;
+	const token = "" + Math.floor( MAX_TOKEN * Math.random() );
 
-		} );
+	activeTokens.push( {
+		token: token,
+		type: type,
+		creation: new Date();
+	} );
 
-		client.socket.onmessage = function( data ) {
+	return ( type === 'yspc' ? 'ws' : 'http' ) + '://yomboprime.org:45000?accessToken=' + token;
 
-			const message = JSON.parse( data.data );
+}
 
-			if ( message ) {
+function purgueOldTokens() {
+	
+	const time = new Date();
+	
+	let i = 0;
+	while ( i < activeTokens.length ) {
+		
+		const t = activeTokens[ i ];
+		if ( t.creation + 30000 < time ) {
+			
+			activeTokens.splice( i, 1 );
+			
+		}
+		else i ++;
+		
+	}
+	}
 
-				console.log( "WS Client message received: " + data.data );
-
-				switch ( message.type ) {
-
-					default:
-						if ( wsClient === client && webClient ) {
-
-							webClient.socket.send( data.data );
-						}
-						break;
-
-				}
-
-			}
-
-		};
-
-    } );
-
+function consumeToken( token ) {
+	
+	return false;
+	
 }
 
 function info( client, text ) {
