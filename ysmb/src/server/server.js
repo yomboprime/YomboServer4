@@ -136,6 +136,8 @@ function createWebServer() {
 			};
 
 			client.socket.onmessage = function( evt ) {
+				
+				console.log( "REceived message." );
 
 				const message = JSON.parse( evt.data );
 

@@ -9,7 +9,7 @@
   "author": "yomboprime",
   "contributors": [],
   "scripts": {
-    "start": "node server.js"
+    "start": "node src/server.js"
   },
   "license": "MIT",
   "dependencies": {
@@ -17,6 +17,7 @@
     "pngjs": "^6.0.0",
     "readable-stream": "^4.0.0",
     "telegram-bot-api": "^2.0.1",
+    "v4l2camera-pr48": "^1.2.1",
     "ws": "^8.8.0"
   }
 }

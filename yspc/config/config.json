@@ -1,4 +1,9 @@
 {
     "version": 1,
-    "intruderAlert": true
+    "intruderAlert": true,
+	"modules": {
+		"Camera": {
+			
+		}
+	}
 }

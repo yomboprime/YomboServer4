@@ -5,7 +5,7 @@ const PNG = require( 'pngjs' ).PNG;
 const fs = require( 'fs' );
 const pathJoin = require( 'path' ).join;
 const { spawn, exec } = require( 'child_process' );
-const tg = require( './src/telegram.js' );
+const tg = require( './telegram.js' );
 const ws = require( 'ws' );
 
 // - Global variables -
@@ -14,8 +14,12 @@ const CONFIG_PATH = "./config/config.json";
 let serverConfig = null;
 
 let isAppEnding = false;
-let modules = [];
-let api = null;
+let modules;
+let modulesByName;
+let api;
+
+// WS local client, connected to the server
+let client;
 
 const USER_IDLE = 0;
 let userResponseState = USER_IDLE;
@@ -66,15 +70,15 @@ function initServer() {
 			tg.sendTextMessage( "ℹ️ " + "YSPC bot is online." );
 
 			//tg.menusEnabled = true;
-/*
-			modules = loadModules();
+
+			loadModules();
+
 			if ( modules === null ) {
 
 				console.log( "Error loading modules." );
 				process.exit( 1 );
 
 			}
-*/
 
 		}
 
@@ -125,7 +129,7 @@ function processPetition( text ) {
 
 function connectToServer( url ) {
 
-	const client = {
+	client = {
 		url: url,
 		connectionTimestamp: new Date().getTime(),
 		socket: null
@@ -139,13 +143,18 @@ function connectToServer( url ) {
 		
 		console.log( "WS client opened." );
 		tg.sendTextMessage( "Connection with server is open." );
+		
+		for ( let i = 0, il = modules.length; i < il; i ++ ) modules[ i ].onClientConnected();
 
 	} );
 
 	client.socket.addEventListener( 'close', () => {
 		
+		client = null;
 		console.log( "WS client closed." );
 		tg.sendTextMessage( "Connection with server is closed." );
+		
+		for ( let i = 0, il = modules.length; i < il; i ++ ) modules[ i ].onClientDisconnected();
 		
 	} );
 
@@ -157,13 +166,11 @@ function connectToServer( url ) {
 
 		if ( ! message ) return;
 
+		const module = modulesByName[ message.module ];
 		
-		switch ( message.type ) {
-					
-			case 'frameAck':
-				break;
-					
-		}
+		if ( ! module ) return;
+
+		module.processMessage( message );
 
 	} );
 
@@ -215,6 +222,113 @@ function playVoiceFile( file_id ) {
 
 }
 
+function loadModules() {
+
+	modules = [];
+	modulesByName = {};
+
+	modules.push( require( './modules/cameraModule.js' ) );
+
+	for ( let i = 0, il = modules.length; i < il; i ++ ) {
+
+		console.log( "Initing module '" + ( modules[ i ].name ? modules[ i ].name : 'unnamed' ) + "'." );
+
+		if ( ! checkProperty( modules[ i ], 'name' ) ) return false;
+		if ( ! checkProperty( modules[ i ], 'init' ) ) return false;
+		if ( ! checkProperty( modules[ i ], 'finish' ) ) return false;
+		if ( ! checkProperty( modules[ i ], 'processMessage' ) ) return false;
+		if ( ! checkProperty( modules[ i ], 'onClientConnected' ) ) return false;
+		if ( ! checkProperty( modules[ i ], 'onClientDisconnected' ) ) return false;
+
+		function checkProperty( module, propertyName ) {
+			
+			if ( module[ propertyName ] === undefined ) {
+				
+				console.log( "Error: Module does not define the '" + + "' property." );
+				return false;
+				
+			}
+			
+			return true;
+			
+		}
+
+		// Set module config
+		var config = serverConfig.modules[ modules[ i ].name ];
+		if ( ! config ) {
+
+			console.log( "Configuration for module '" + modules[ i ].name + "' was not found." );
+			return false;
+
+		}
+
+		modules[ i ].config = config;
+
+	}
+
+	// Check duplicated names
+	for ( var i = 0, n = modules.length; i < n - 1; i ++ ) {
+
+		for ( var j = i + 1; j < n; j ++ ) {
+
+			if ( modules[ i ].name === modules[ j ].name ) {
+
+				console.log( "Error: duplicated module name: '" + modules[ i ].name + "'" );
+				return false;
+
+			}
+
+		}
+
+	}
+
+	// Init modules
+	api = createAPI();
+	for ( var i = 0, il = modules.length; i < il; i ++ ) {
+
+		const errorMessage = modules[ i ].init( modules[ i ], api )
+		if ( errorMessage ) {
+
+			console.log( "Error: Module '" + modules[ i ].name + "' was not inited properly. Error message: " + errorMessage );
+			return false;
+					}
+
+	}
+
+	for ( var i = 0, il = modules.length; i < il; i ++ ) {
+
+		modulesByName[ modules[ i ].name ] = modules[ i ];
+		
+	}
+
+	return true;
+
+}
+
+function stopModules( onDone ) {
+
+	iterateAsync( modules, "finish", onDone );
+
+}
+
+function createAPI() {
+
+	return {
+
+		serverConfig: serverConfig,
+		tg: tg,
+		
+		getClient: () => { return client; },
+
+		spawnProgram: spawnProgram,
+		execProgram: execProgram,
+
+		pathJoin: pathJoin
+
+	}
+
+}
+
 function loadFileJSON( path, encoding ) {
 
 	try {
@@ -242,12 +356,6 @@ function loadFile( path, encoding ) {
 		return null;
 
 	}
-
-}
-
-function saveConfig() {
-
-	fs.writeFileSync( CONFIG_PATH, JSON.stringify( serverConfig, null, 4 ), "latin1" );
 
 }
 
@@ -323,14 +431,14 @@ function execProgram( cwd, command, callback, cancelOutput ) {
 
 function finish( action ) {
 
-	tg.clearAllMenus();
+	//tg.clearAllMenus();
 	tg.stopTelegram();
 
-	//stopModules( () => {
+	stopModules( () => {
 
 		exit( action );
 
-	//} )
+	} );
 
 }
 
