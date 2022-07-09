@@ -169,7 +169,7 @@ function createWebServer() {
 		},
 		onClientDisconnection: function( client ) {
 
-			scope.log( "Client disconnected. ");
+			console.log( "Client disconnected. ");
 
 			if ( client === wsClient ) wsClient = null;
 			else webClient = null;
