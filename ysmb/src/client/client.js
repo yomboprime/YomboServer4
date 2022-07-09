@@ -138,6 +138,7 @@ function initGUI() {
 	imageCanvasCtx = imageCanvas.getContext( '2d' );
 	imageCanvasCtx.fillStyle = 'darkgreen';
 	imageCanvasCtx.fillRect( 0, 0, 640, 480 );
+	document.body.appendChild( imageCanvas );
 
 /*
 	// Main divs
