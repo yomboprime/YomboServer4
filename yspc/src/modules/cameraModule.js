@@ -80,7 +80,7 @@ function finish( onFinished ) {
 
 function onClientConnected() {
 	
-	
+	frameAcknowledged = true;
 	}
 
 function onClientDisconnected() {
