@@ -17,7 +17,7 @@ const xres = 640;
 const yres = 480;
 const fps = 30;
 
-let lastFrame;
+//let lastFrame;
 
 let webcam;
 let frameRequested = false;
@@ -91,9 +91,9 @@ function onCaptured( success ) {
 	// Get frame
 	const frameJPG = webcam.frameRaw();
 	
-	lastFrame = frameJPG;
+	//lastFrame = frameJPG;
 
-/*
+
 	// Send frame
 	if ( frameRequested ) {
 
@@ -102,7 +102,7 @@ function onCaptured( success ) {
 		frameRequested = false;
 
 	}
-*/
+
 	// Capture next frame
 	webcam.capture( onCaptured );
 
@@ -115,10 +115,12 @@ function processMessage( message ) {
 				
 		case 'frameRequest':
 			
-			//frameRequested = true;
+			frameRequested = true;
 			
+			/*
 			const client = api.getClient();
 			if ( client ) client.socket.send( lastFrame );
+			*/
 			
 			break;
 				
