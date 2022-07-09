@@ -18,8 +18,7 @@ const yres = 480;
 const fps = 30;
 
 let webcam;
-let lastFrame;
-let frameAcknowledged = true;
+let frameRequested = false;
 
 function init( moduleParam, apiParam ) {
 
@@ -79,14 +78,10 @@ function finish( onFinished ) {
 }
 
 function onClientConnected() {
-	
-	frameAcknowledged = true;
-	}
+}
 
 function onClientDisconnected() {
-	
-	frameAcknowledged = true;
-	
+
 }
 
 function onCaptured( success ) {
@@ -94,16 +89,14 @@ function onCaptured( success ) {
 	// Get frame
 	const frameJPG = webcam.frameRaw();
 	
-	lastFrame = frameJPG;
-
 	// Send frame
-	if ( frameAcknowledged ) {
+	if ( frameRequested ) {
 		
-		console.log( lastFrame.length );
+		console.log( frameJPG.length );
 
 		const client = api.getClient();
-		if ( client ) client.socket.send( lastFrame );
-		frameAcknowledged = false;
+		if ( client ) client.socket.send( frameJPG );
+		frameRequested = false;
 		
 	}
 
@@ -117,8 +110,8 @@ function processMessage( message ) {
 	
 	switch ( message.type ) {
 				
-		case 'frameAck':
-			frameAcknowledged = true;
+		case 'frameRequest':
+			frameRequested = true;
 			break;
 				
 	}

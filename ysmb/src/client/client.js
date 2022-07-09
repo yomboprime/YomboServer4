@@ -65,7 +65,10 @@ function processMessage( data ) {
 
 		console.log( "Binary message." );
 
-		//socket.send( '{ "frame": true }' );
+		socket.send( JSON.stringify( {
+			module: 'Camera',
+			type: 'frameRequest'
+		} ) );
 
 	}
 	else {
@@ -86,10 +89,10 @@ function processMessage( data ) {
 
 			case 'init':
 				console.log( "Received init message " );
-				break;
-
-			case 'frame':
-				showMessage( "Received FRAME" );
+				socket.send( JSON.stringify( {
+					module: 'Camera',
+					type: 'frameRequest'
+				} ) );
 				break;
 
 			case 'info':
