@@ -132,12 +132,16 @@ function createWebServer() {
 				
 				if ( Buffer.isBuffer( evt.data ) ) {
 					
+					console.log( "Received binary message" );
+					
 					// Binary message
 					doTransmit = true;
 					
 				}
 				else {
-					
+
+					console.log( "Received text message" );
+
 					// Text message
 				
 					const message = JSON.parse( evt.data );
