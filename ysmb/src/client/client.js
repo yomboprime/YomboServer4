@@ -126,7 +126,7 @@ function initGUI() {
 	userMessageDiv = document.createElement( 'div' );
 	userMessageDiv.style.position = 'absolute';
 	userMessageDiv.style.top = '25%';
-	userMessageDiv.style.bottom = '75%';
+	userMessageDiv.style.bottom = '25%';
 	userMessageDiv.style.left = '20px';
 	userMessageDiv.style.right = '20px';
 	userMessageDiv.style.border = 'solid 1px';
