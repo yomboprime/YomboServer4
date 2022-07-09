@@ -99,8 +99,6 @@ function createWebServer() {
 		},
 		onClientConnection: function( client ) {
 
-			console.log( "Client connected." );
-
 			const params = webAppServer.getURLParameters( client.req.url );
 			let token = null;
 			for ( let i = 0; i < params.length; i++ ) {
@@ -122,31 +120,15 @@ function createWebServer() {
 			
 			console.log( "Client validated." );
 			
-			if ( tokenReg.type === 'yspc' ) {
-				
-				wsClient = client;
-
-			}
-			else {
-
-				webClient = client;
-
-			}
+			if ( tokenReg.type === 'yspc' ) wsClient = client;
+			else webClient = client;
 
 			client.socket.onerror = function( data ) {
 
 				console.log( "Client Error: " + data );
 
-				if ( tokenReg.type === 'yspc' ) {
-				
-					wsClient = null;
-
-				}
-				else {
-
-					webClient = null;
-
-				}
+				if ( tokenReg.type === 'yspc' ) wsClient = null;
+				else webClient = null;
 
 			};
 
@@ -185,18 +167,8 @@ function createWebServer() {
 		},
 		onClientDisconnection: function( client ) {
 
-			console.log( "Client disconnected." );
-
-			if ( client === wsClient ) {
-			
-				wsClient = null;
-
-			}
-			else {
-
-				webClient = null;
-
-			}
+			if ( client === wsClient ) wsClient = null;
+			else webClient = null;
 
 		}
 	} );
