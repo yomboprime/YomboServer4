@@ -128,7 +128,7 @@ function createWebServer() {
 
 			client.socket.onmessage = function( evt ) {
 
-				console.log( typeof evt.data );
+				console.log( evt );
 				
 				const message = JSON.parse( evt.data );
 
