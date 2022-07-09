@@ -43,6 +43,7 @@ function initNetwork() {
 
 	socket.onclose = function() {
 		console.log( "Connection Closed." );
+		userMessage( "Connection was closed.", 'red' );
 	};
 
 
