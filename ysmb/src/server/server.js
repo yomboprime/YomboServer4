@@ -111,10 +111,6 @@ function createWebServer() {
 					
 				}
 			}
-			
-			console.log( "Token: " );
-			console.log( token );
-
 			const tokenReg = consumeToken( token );
 			if ( ! tokenReg ) {
 				
@@ -305,12 +301,7 @@ function consumeToken( token ) {
 
 			activeTokens.splice( i, 1 );
 			purgueOldTokens();
-			
-			console.log( t.creation );
-			console.log( TOKEN_EXPIRATION_MS );
-			console.log( t.creation + TOKEN_EXPIRATION_MS );
-			console.log( time );
-			
+
 			if ( t.creation + TOKEN_EXPIRATION_MS > time ) return t;
 			else return null;
 			
