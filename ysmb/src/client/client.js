@@ -125,7 +125,7 @@ function initGUI() {
 	userMessageDiv.style.backgroundColor = 'black';
 	userMessageDiv.style.color = 'white';
 	userMessageDiv.style.borderColor = 'white';
-	userMessageDiv.addEveentListener( 'click', dismissUserMessage );
+	userMessageDiv.addEventListener( 'click', dismissUserMessage );
 
 /*
 	// Main divs
