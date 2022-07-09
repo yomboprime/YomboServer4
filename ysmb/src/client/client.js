@@ -300,7 +300,7 @@ function setButtonDisabled( button, disabled ) {
 
 function createImageURLFromContent( content, type, isBlob = false ) {
 
-	if ( isBlob ) return window.URL.createObjectURL( content, { type: type } ) );
+	if ( isBlob ) return window.URL.createObjectURL( content, { type: type } );
 	else return window.URL.createObjectURL( new Blob( [ content ], { type: type } ) );
 
 }
