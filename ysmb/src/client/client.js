@@ -209,9 +209,10 @@ function onWindowResize() {
 	const w = window.innerWidth;
 	const h = window.innerHeight;
 	
-	const canvasHeight = Math.floor( w * 480 / 640 );
+	const canvasHeight = Math.min( h, Math.floor( w * 480 / 640 ) );
+	const canvasWidth = Math.floor( canvasHeight * 640 / 480 );
 
-	imageCanvas.style.width = w + 'px';
+	imageCanvas.style.width = canvasWidth + 'px';
 	imageCanvas.style.height = canvasHeight + 'px';
 
 }
