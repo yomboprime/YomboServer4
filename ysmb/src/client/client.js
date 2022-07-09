@@ -75,7 +75,7 @@ function processMessage( data ) {
 			const lapse = currentTime - lastTime;
 			const fps = 1000 / lapse;
 			
-			currentFPS = currentFPS * 0.99 + fps * 0.01;
+			currentFPS = currentFPS * 0.9 + fps * 0.1;
 			const currentFPSRounded = Math.floor( currentFPS * 100 ) / 100;
 			
 			
