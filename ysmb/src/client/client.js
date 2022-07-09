@@ -61,9 +61,17 @@ function processMessage( data ) {
 	//if ( data instanceof ArrayBuffer ) {
 	if ( data instanceof Blob ) {
 
-		// Binary message
+		// Binary message: Image frame
 
 		console.log( "Binary message." );
+		
+		const image = document.createElement( 'img' );
+		image.onload = () => {
+			
+			imageCanvasCtx.drawImage( image, 0, 0 );
+			
+		};
+		image.src = createJPEGFromContent( data );
 
 		socket.send( JSON.stringify( {
 			module: 'Camera',

@@ -88,7 +88,7 @@ function initServer() {
 
 function parseUserInput( message ) {
 
-	console.log( "Received message: " + message.text );
+	//console.log( "Received message: " + message.text );
 
 	if ( message.text ) {
 
@@ -115,13 +115,6 @@ function processPetition( text ) {
 	const url = text;
 	
 	if ( ! url.startsWith( 'ws://yomboprime.org:45000?accessToken=' ) ) return;
-
-	console.log( "Received petition: " + url );
-
-/*
-	const MAX_TOKEN = 1000000000;
-	const token = "" + Math.floor( MAX_TOKEN * Math.random() );
-*/
 
 	connectToServer( url );
 
@@ -160,7 +153,7 @@ function connectToServer( url ) {
 
 	client.socket.addEventListener( 'message', ( data ) => {
 		
-		console.log( "WS client message: " + data.data );
+		//console.log( "WS client message: " + data.data );
 
 		const message = JSON.parse( data.data );
 
