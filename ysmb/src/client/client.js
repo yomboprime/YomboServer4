@@ -7,7 +7,8 @@ let accessToken = null;
 // GUI
 
 let userMessageDiv;
-
+let imageCanvas;
+let imageCanvasCtx;
 
 // Main code
 
@@ -127,6 +128,16 @@ function initGUI() {
 	userMessageDiv.style.color = 'white';
 	userMessageDiv.style.borderColor = 'white';
 	userMessageDiv.addEventListener( 'click', dismissUserMessage );
+	
+	imageCanvas = document.createElement( 'canvas' );
+	imageCanvas.width = 640;
+	imageCanvas.height = 480;
+	imageCanvas.style.position = 'absolute';
+	imageCanvas.style.top = '0px';
+	imageCanvas.style.left = '0px';
+	imageCanvasCtx = imageCanvas.getContext( '2d' );
+	imageCanvasCtx.fillStyle( 'darkgreen' );
+	imageCanvasCtx.fillRect( 0, 0, 640, 480 );
 
 /*
 	// Main divs
@@ -189,6 +200,18 @@ function initGUI() {
 	window.addEventListener( 'resize', onWindowResize );
 
 	onWindowResize();
+
+}
+
+function onWindowResize() {
+
+	const w = window.innerWidth;
+	const h = window.innerHeight;
+	
+	const canvasHeight = Math.floor( w * 480 / 640 );
+
+	imageCanvas.style.width = w + 'px';
+	imageCanvas.style.height = canvasHeight + 'px';
 
 }
 
@@ -260,25 +283,6 @@ function setButtonDisabled( button, disabled ) {
 
 	button.disabled = disabled;
 
-}
-
-function onWindowResize() {
-
-	const w = window.innerWidth;
-	const h = window.innerHeight;
-/*
-	const editorWidth = Math.max( 0, w - FILE_BAR_WIDTH );
-	const editorHeight = Math.max( 0, h - ICON_BAR_HEIGHT - INFO_BAR_HEIGHT );
-
-	fileBarDIV.style.height = editorHeight + "px";
-	fileBarDIV.style.top = ICON_BAR_HEIGHT + "px";
-	fileBarDIV.style.left = "0px";
-
-	editorDIV.style.width = editorWidth + "px";
-	editorDIV.style.height = editorHeight + "px";
-
-	editor.resize();
-*/
 }
 
 function createImageURLFromContent( content, type ) {
