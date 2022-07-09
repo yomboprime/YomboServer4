@@ -111,14 +111,6 @@ function processMessage( data ) {
 
 }
 
-function userMessage( text, color = 'white' ) {
-	
-	const span = document.createElement( 'span' );
-	span.innerHTML = text;
-	document.body.appendChild( span );
-	
-}
-
 function initGUI() {
 
 	//const openProjectIconPath = './icons/tango/tango/Document-open.svg';
@@ -133,8 +125,8 @@ function initGUI() {
 	userMessageDiv.style.backgroundColor = 'black';
 	userMessageDiv.style.color = 'white';
 	userMessageDiv.style.borderColor = 'white';
-	userMessageDiv.innerHTML = "lsdhkjlshkjklsjh dkjsh ddkjh kjd s kjhkljskjlh jkjklh jk";
-	document.body.appendChild( userMessageDiv );
+	userMessageDiv.addEveentListener( 'click', dismissUserMessage );
+
 /*
 	// Main divs
 
@@ -197,6 +189,22 @@ function initGUI() {
 
 	onWindowResize();
 
+}
+
+function userMessage( text, color = 'white' ) {
+	
+	userMessageDiv.innerHTML = text;
+	userMessageDiv.style.color = color;
+	userMessageDiv.style.borderColor = color;
+	
+	if ( ! document.body.contains( userMessageDiv ) ) document.body.appendChild( userMessageDiv );
+	
+}
+
+function dismissUserMessage() {
+	
+	if ( document.body.contains( userMessageDiv ) ) document.body.removeChild( userMessageDiv );
+	
 }
 
 function createButton( iconPath, tooltip, onClick ) {
