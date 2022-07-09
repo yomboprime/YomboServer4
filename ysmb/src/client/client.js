@@ -4,6 +4,10 @@
 let socket;
 let accessToken = null;
 
+// GUI
+
+let userMessageDiv;
+
 
 // Main code
 
@@ -13,6 +17,8 @@ init();
 // Functions
 
 function init() {
+	
+	initGUI();
 
 	initNetwork();
 
@@ -46,14 +52,6 @@ function initNetwork() {
 
 	};
 
-}
-
-function showMessage( text ) {
-	
-	const span = document.createElement( 'span' );
-	span.innerHTML = text;
-	document.body.appendChild( span );
-	
 }
 
 function processMessage( data ) {
@@ -113,55 +111,31 @@ function processMessage( data ) {
 
 }
 
-function getFilenameExtension( path ) {
-
-	path = path || "";
-
-	const pathLastIndexOfDot = path.lastIndexOf( "." );
-
-	if ( pathLastIndexOfDot > 0 && path.length > pathLastIndexOfDot + 1 ) {
-
-		return path.substring( pathLastIndexOfDot + 1 );
-
-	}
-	else return "";
-
-}
-
-function createScrolledDiv( childDiv ) {
-
-	var scrolledDiv = document.createElement( 'div' );
-	scrolledDiv.style.overflowY = "scroll";
-	scrolledDiv.appendChild( childDiv );
-	return scrolledDiv;
-
-}
-
-function createDataList( id, array ) {
-
-
-	const dataList = document.createElement( 'datalist' );
-	dataList.id = id;
-
-	for ( let i in array ) {
-
-		const option = document.createElement( 'option' );
-		option.value = array[ i ];
-		dataList.appendChild( option );
-
-	}
-
-	return dataList;
-
+function userMessage( text, color = 'white' ) {
+	
+	const span = document.createElement( 'span' );
+	span.innerHTML = text;
+	document.body.appendChild( span );
+	
 }
 
 function initGUI() {
 
-	const openProjectIconPath = './icons/tango/tango/Document-open.svg';
-	const refreshProjectIconPath = './icons/tango/tango/View-refresh.svg';
-	const saveAllFilesIconPath = './icons/tango/tango/Media-floppy.svg';
-	const closeFileIconPath = './icons/tango/tango/Dialog-error-round.svg';
-
+	//const openProjectIconPath = './icons/tango/tango/Document-open.svg';
+	
+	userMessageDiv = document.createElement( 'div' );
+	userMessageDiv.style.position = 'absolute';
+	userMessageDiv.style.top = '25%';
+	userMessageDiv.style.bottom = '75%';
+	userMessageDiv.style.left = '20px';
+	userMessageDiv.style.right = '20px';
+	userMessageDiv.style.border = 'solid 1px';
+	userMessageDiv.style.backgroundColor = 'black';
+	userMessageDiv.style.color = 'white';
+	userMessageDiv.style.borderColor = 'white';
+	userMessageDiv.innerHTML = "lsdhkjlshkjklsjh dkjsh ddkjh kjd s kjhkljskjlh jkjklh jk";
+	document.body.appendChild( userMessageDiv );
+/*
 	// Main divs
 
 	iconBarDIV = document.createElement( 'div' );
@@ -199,24 +173,6 @@ function initGUI() {
 
 	// Icon bar
 
-	function createButton( iconPath, tooltip, onClick ) {
-
-		const button = document.createElement( 'span' );
-		//button.style.flex = '1';
-		button.style.width = ICON_BAR_HEIGHT + 'px';
-		button.style.height = ICON_BAR_HEIGHT + 'px';
-		button.style.marginLeft = '5px';
-		button.style.marginRight = '5px';
-		const image = document.createElement( 'img' );
-		image.src = iconPath;
-		button.addEventListener( 'click', onClick, false );
-		if ( tooltip ) button.title = tooltip;
-		button.appendChild( image );
-
-		return button;
-
-	}
-
 	const refreshProjectButton = createButton( refreshProjectIconPath, translation[ "Refresh files list" ], refreshProject );
 	iconBarDIV.appendChild( refreshProjectButton);
 
@@ -234,32 +190,57 @@ function initGUI() {
 	document.body.appendChild( infoBarDIV );
 	document.body.appendChild( fileBarDIV );
 	document.body.appendChild( editorDIV );
-
-	editor = ace.edit( editorDIV, {
-		/*mode: "ace/mode/javascript",
-		selectionStyle: "text"*/
-	} );
-
-	editor.setTheme( 'ace/theme/ambiance' );
-	//editor.setDisplayIndentGuides( false );
-	editor.setShowFoldWidgets( false );
-	editor.setShowInvisibles( true );
-	editor.setPrintMarginColumn( - 1 );
-	editor.session.setTabSize( 4 );
-
-	editor.on( 'change', () => {
-
-		const doUpdate = ! editorIsDirty && filesList;
-
-		editorIsDirty = true;
-
-		if ( doUpdate ) filesList.updateDirtyFlags();
-
-	} );
+	
+	*/
 
 	window.addEventListener( 'resize', onWindowResize );
 
 	onWindowResize();
+
+}
+
+function createButton( iconPath, tooltip, onClick ) {
+
+	const button = document.createElement( 'span' );
+	//button.style.flex = '1';
+	button.style.width = ICON_BAR_HEIGHT + 'px';
+	button.style.height = ICON_BAR_HEIGHT + 'px';
+	button.style.marginLeft = '5px';
+	button.style.marginRight = '5px';
+	const image = document.createElement( 'img' );
+	image.src = iconPath;
+	button.addEventListener( 'click', onClick, false );
+	if ( tooltip ) button.title = tooltip;
+	button.appendChild( image );
+
+	return button;
+
+}
+
+function createScrolledDiv( childDiv ) {
+
+	var scrolledDiv = document.createElement( 'div' );
+	scrolledDiv.style.overflowY = "scroll";
+	scrolledDiv.appendChild( childDiv );
+	return scrolledDiv;
+
+}
+
+function createDataList( id, array ) {
+
+
+	const dataList = document.createElement( 'datalist' );
+	dataList.id = id;
+
+	for ( let i in array ) {
+
+		const option = document.createElement( 'option' );
+		option.value = array[ i ];
+		dataList.appendChild( option );
+
+	}
+
+	return dataList;
 
 }
 
@@ -312,5 +293,20 @@ function createJPEGFromContent( content ) {
 function createSVGFromContent( content ) {
 
     return createImageURLFromContent( content, "image/svg+xml" );
+
+}
+
+function getFilenameExtension( path ) {
+
+	path = path || "";
+
+	const pathLastIndexOfDot = path.lastIndexOf( "." );
+
+	if ( pathLastIndexOfDot > 0 && path.length > pathLastIndexOfDot + 1 ) {
+
+		return path.substring( pathLastIndexOfDot + 1 );
+
+	}
+	else return "";
 
 }
