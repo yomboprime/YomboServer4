@@ -136,10 +136,10 @@ function createWebServer() {
 			};
 
 			client.socket.onmessage = function( evt ) {
-				
-				console.log( message );
 
 				const message = JSON.parse( evt.data );
+				
+				console.log( message );
 
 				if ( message ) {
 
