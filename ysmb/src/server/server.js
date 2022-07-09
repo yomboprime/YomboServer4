@@ -67,15 +67,6 @@ function initServer() {
 			tg.sendTextMessage( "ℹ️ " + "YSMB bot is online." );
 
 			//tg.menusEnabled = true;
-/*
-			modules = loadModules();
-			if ( modules === null ) {
-
-				console.log( "Error loading modules." );
-				process.exit( 1 );
-
-			}
-*/
 
 		}
 
@@ -137,7 +128,7 @@ function createWebServer() {
 
 			client.socket.onmessage = function( evt ) {
 
-				console.log( evt.data );
+				console.log( typeof evt.data );
 				
 				const message = JSON.parse( evt.data );
 
