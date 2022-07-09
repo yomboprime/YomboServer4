@@ -127,7 +127,7 @@ function connectToServer( url ) {
 
 	const client = {
 		url: url,
-		connectionTimestamp: new Date(),
+		connectionTimestamp: new Date().getTime(),
 		socket: null
 	};
 
@@ -138,12 +138,14 @@ function connectToServer( url ) {
 	client.socket.addEventListener( 'open', () => {
 		
 		console.log( "WS client opened." );
+		tg.sendTextMessage( "Connection with server is open." );
 
 	} );
 
 	client.socket.addEventListener( 'close', () => {
 		
 		console.log( "WS client closed." );
+		tg.sendTextMessage( "Connection with server is closed." );
 		
 	} );
 
@@ -183,7 +185,7 @@ function playVoiceFile( file_id ) {
 
 		const localPath = pathJoin( serverConfig.captureVideosPath, "voiceMessages" );
 		fs.mkdirSync( localPath, { recursive: true } );
-		localPath = pathJoin( localPath, ( new Date() ).getTime() + file.file_path.replace( '/', '_' ) );
+		localPath = pathJoin( localPath, ( new Date().getTime() ) + file.file_path.replace( '/', '_' ) );
 
 		tg.downloadTelegramFile( file, localPath, ( success ) => {
 
