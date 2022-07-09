@@ -63,7 +63,7 @@ function processMessage( data ) {
 
 		// Binary message
 
-		//console.log( "Binary message." );
+		console.log( "Binary message." );
 
 		//socket.send( '{ "frame": true }' );
 

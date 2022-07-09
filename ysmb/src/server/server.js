@@ -128,28 +128,45 @@ function createWebServer() {
 
 			client.socket.onmessage = function( evt ) {
 
-				console.log( evt );
+				let doTransmit = false;
 				
-				const message = JSON.parse( evt.data );
+				if ( Buffer.isBuffer( evt.data ) ) {
+					
+					// Binary message
+					doTransmit = true;
+					
+				}
+				else {
+					
+					// Text message
+				
+					const message = JSON.parse( evt.data );
 
-				if ( message ) {
+					if ( message ) {
 
-					console.log( "Client message: " + evt.data );
+						console.log( "Client message: " + evt.data );
 
-					switch ( message.type ) {
+						switch ( message.type ) {
 
-						case 'exit':
-							beginAppTermination( EXIT_NO_ACTION );
-							break;
+							case 'exit':
+								beginAppTermination( EXIT_NO_ACTION );
+								break;
 
-						default:
-						
-							const otherClient = tokenReg.type === 'yspc' ? webClient : wsClient;
-							if ( otherClient ) otherClient.socket.send( evt.data );
-							else error( client, "No peer connection (type: " + tokenReg.type + ")." );
-							break;
+							default:
+								doTransmit = true;
+								break;
+
+						}
 
 					}
+
+				}
+				
+				if ( doTransmit ) {
+					
+					const otherClient = tokenReg.type === 'yspc' ? webClient : wsClient;
+					if ( otherClient ) otherClient.socket.send( evt.data );
+					else error( client, "No peer connection (type: " + tokenReg.type + ")." );
 
 				}
 
