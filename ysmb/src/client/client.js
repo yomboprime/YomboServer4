@@ -10,6 +10,10 @@ let userMessageDiv;
 let imageCanvas;
 let imageCanvasCtx;
 
+let label;
+let lastTime = null;
+let currentFPS = 0;
+
 // Main code
 
 init();
@@ -63,7 +67,23 @@ function processMessage( data ) {
 
 		// Binary message: Image frame
 
-		console.log( "Binary message." );
+		//console.log( "Binary message." );
+
+		const currentTime = window.performance.now();
+		if ( lastTime !== null ) {
+			
+			const lapse = currentTime - lastTime;
+			const fps = 1000 / lapse;
+			
+			currentFPS = currentFPS * 0.99 + fps * 0.01;
+			const currentFPSRounded = Math.floor( currentFPS * 100 ) / 100;
+			
+			
+			label.innerHTML = 'FPS: ' + currentFPSRounded;
+			
+		}
+		lastTime = currentTime;
+
 		
 		const image = document.createElement( 'img' );
 		image.onload = () => {
@@ -150,6 +170,16 @@ function initGUI() {
 	imageCanvasCtx.fillStyle = 'darkgreen';
 	imageCanvasCtx.fillRect( 0, 0, 640, 480 );
 	document.body.appendChild( imageCanvas );
+	
+	label = document.createElement( 'div' );
+	label.style.position = 'absolute';
+	label.style.top = '20px';
+	label.style.left = '20px';
+	label.style.width = '150px';
+	label.style.height = '60px';
+	label.style.backgroundColor = 'black';
+	label.style.color = 'white';
+	document.body.appendChild( label );
 
 /*
 	// Main divs

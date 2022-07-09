@@ -114,8 +114,18 @@ function createWebServer() {
 			
 			console.log( "Client validated. Token: " + token + ". Type: " + tokenReg.type );
 			
-			if ( tokenReg.type === 'yspc' ) wsClient = client;
-			else webClient = client;
+			if ( tokenReg.type === 'yspc' ) {
+				
+				if ( wsClient ) wsClient.socket.terminate();
+				wsClient = client;
+				
+			}
+			else {
+				
+				if ( webClient ) webClient.socket.terminate();
+				webClient = client;
+				
+			}
 
 			client.socket.onerror = function( evt ) {
 
