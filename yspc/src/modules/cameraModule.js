@@ -91,13 +91,11 @@ function onCaptured( success ) {
 	
 	// Send frame
 	if ( frameRequested ) {
-		
-		console.log( frameJPG.length );
 
 		const client = api.getClient();
 		if ( client ) client.socket.send( frameJPG );
 		frameRequested = false;
-		
+
 	}
 
 	// Capture next frame

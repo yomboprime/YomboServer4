@@ -71,7 +71,7 @@ function processMessage( data ) {
 			imageCanvasCtx.drawImage( image, 0, 0 );
 			
 		};
-		image.src = createJPEGFromContent( data );
+		image.src = createJPEGFromContent( data, true );
 
 		socket.send( JSON.stringify( {
 			module: 'Camera',
@@ -298,27 +298,28 @@ function setButtonDisabled( button, disabled ) {
 
 }
 
-function createImageURLFromContent( content, type ) {
+function createImageURLFromContent( content, type, isBlob = false ) {
 
-    return window.URL.createObjectURL( new Blob( [ content ], { type: type } ) );
-
-}
-
-function createPNGFromContent( content ) {
-
-    return createImageURLFromContent( content, "image/png" );
+	if ( isBlob ) return window.URL.createObjectURL( content, { type: type } ) );
+	else return window.URL.createObjectURL( new Blob( [ content ], { type: type } ) );
 
 }
 
-function createJPEGFromContent( content ) {
+function createPNGFromContent( content, isBlob = false ) {
 
-    return createImageURLFromContent( content, "image/jpeg" );
+    return createImageURLFromContent( content, "image/png", isBlob );
 
 }
 
-function createSVGFromContent( content ) {
+function createJPEGFromContent( content, isBlob = false ) {
 
-    return createImageURLFromContent( content, "image/svg+xml" );
+    return createImageURLFromContent( content, "image/jpeg", isBlob );
+
+}
+
+function createSVGFromContent( content, isBlob = false ) {
+
+    return createImageURLFromContent( content, "image/svg+xml", isBlob );
 
 }
 
