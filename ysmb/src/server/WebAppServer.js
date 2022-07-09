@@ -268,8 +268,6 @@ WebAppServer.prototype.onClientConnectionInternal = function( socket, req ) {
 
     this.clients.push( client );
 
-    this.log( "Client connected." );
-
     //socket.heartbeatTimeout = this.config.connectionTimeout;
 
     const scope = this;
@@ -277,8 +275,6 @@ WebAppServer.prototype.onClientConnectionInternal = function( socket, req ) {
     socket.on( "close", function( msg ) {
 
         scope.listener.onClientDisconnection( client, msg );
-
-        scope.log( "Client disconnected." );
 
         const index = scope.clients.indexOf( client );
 

@@ -109,36 +109,39 @@ function createWebServer() {
 					
 				}
 			}
+
+			console.log( "Client connected. Token: " + token );
+
 			const tokenReg = consumeToken( token );
 			if ( ! tokenReg ) {
 				
-				console.log( "Client NOT validated." );
+				console.log( "Client NOT validated. Token: " + token );
 				client.socket.terminate();
 				return;
 				
 			}
 			
-			console.log( "Client validated." );
+			console.log( "Client validated. Token: " + token + ". Type: " + tokenReg.type );
 			
 			if ( tokenReg.type === 'yspc' ) wsClient = client;
 			else webClient = client;
 
-			client.socket.onerror = function( data ) {
+			client.socket.onerror = function( evt ) {
 
-				console.log( "Client Error: " + data );
+				console.log( "Client Error: " + evt + ". Token: " + token );
 
 				if ( tokenReg.type === 'yspc' ) wsClient = null;
 				else webClient = null;
 
 			};
 
-			client.socket.onmessage = function( data ) {
+			client.socket.onmessage = function( evt ) {
 
-				const message = JSON.parse( data.data );
+				const message = JSON.parse( evt.data );
 
 				if ( message ) {
 
-					console.log( "Client message: " + data.data );
+					console.log( "Client message: " + evt.data );
 
 					switch ( message.type ) {
 
@@ -149,8 +152,7 @@ function createWebServer() {
 						default:
 						
 							const otherClient = tokenReg.type === 'yspc' ? webClient : wsClient;
-							//if ( otherClient ) otherClient.socket.send( data.data );
-							if ( otherClient ) otherClient.socket.send( JSON.stringify( message ) );
+							if ( otherClient ) otherClient.socket.send( evt.data );
 							else error( client, "No peer connection (type: " + tokenReg.type + ")." );
 							break;
 
@@ -166,6 +168,8 @@ function createWebServer() {
 
 		},
 		onClientDisconnection: function( client ) {
+
+			scope.log( "Client disconnected. ");
 
 			if ( client === wsClient ) wsClient = null;
 			else webClient = null;
@@ -237,7 +241,8 @@ function addToken( type ) {
 		creation: new Date().getTime()
 	} );
 
-	return ( type === 'yspc' ? 'ws' : 'http' ) + '://yomboprime.org:45000?accessToken=' + token;
+	if ( type === 'yspc' ) return 'ws://yomboprime.org:45000?accessToken=' + token;
+	else return 'http://yomboprime.org:45000/client.html?accessToken=' + token;
 
 }
 
